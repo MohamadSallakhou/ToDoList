@@ -6,6 +6,8 @@ import lombok.Setter;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -54,17 +56,42 @@ class TodoController {
 	}
 }
 
+@Controller
+@RequestMapping("/tasks")
+class TodoViewController {
+	private final List<Task> tasks = new ArrayList<>();
+	private final AtomicLong counter = new AtomicLong();
+
+	@GetMapping
+	public String getAllTasks(Model model) {
+		model.addAttribute("tasks", tasks);
+		return "todo";  // Thymeleaf sucht nach einer Datei mit dem Namen "todo.html" in /resources/templates
+	}
+
+	@PostMapping("/addTask")
+	public String addTask(String description) {
+		Task newTask = new Task();
+		newTask.setId(counter.incrementAndGet());
+		newTask.setDescription(description);
+		newTask.setCompleted(false);
+		tasks.add(newTask);
+		return "redirect:/tasks";  // Nach dem Hinzufügen einer Aufgabe wird die Liste neu geladen
+	}
+}
+
+@RestController
+@RequestMapping("/")
+class HomeController {
+	@GetMapping
+	public String home() {
+		return "Willkommen zur ToDo-Liste Anwendung! Verwende /tasks, um die Aufgabenliste zu sehen.";
+	}
+}
+
 @Setter
 @Getter
 class Task {
-    // Getters and Setters
-    private Long id;
+	private Long id;
 	private String description;
 	private boolean completed;
-
-    public ResponseEntity<Task> addTask(@Valid @RequestBody Task newTask) {
-        return null;
-    }
-
 }
-

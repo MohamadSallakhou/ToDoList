@@ -36,4 +36,16 @@ dependencies {
 
 tasks.named('test') {
 	useJUnitPlatform()
+	bootRun {
+		mainClass = 'com.example.demo.TodoApplication' // Stelle sicher, dass die Klasse existiert
+	}
+
+	jar {
+		manifest {
+			attributes(
+					'Main-Class': 'com.example.demo.TodoApplication' // Die Klasse, die im JAR ausgeführt werden soll
+			)
+		}
+	}
+
 }

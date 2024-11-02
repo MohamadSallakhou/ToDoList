@@ -1,37 +1,101 @@
 package DatenBank;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.sql.Statement;
+import jakarta.validation.Valid;
+import lombok.Getter;
+import lombok.Setter;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
 
-public class DatabaseConnection {
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicLong;
+
+@SpringBootApplication
+class TodoApplication {
     public static void main(String[] args) {
-        // H2-Datenbank-Verbindungsdetails
-        String url = "jdbc:h2:file:./todo_db";  // Lokale Datei-basierte H2-Datenbank
-        String user = "sa";
-        String password = "";
+        SpringApplication.run(TodoApplication.class, args);
+    }
+}
 
-        // Verbindung zur H2-Datenbank herstellen
-        try (Connection connection = DriverManager.getConnection(url, user, password)) {
-            System.out.println("Verbindung zur H2-Datenbank hergestellt!");
+@RestController
+@RequestMapping("/api/tasks")
+class TodoController {
+    private final List<Task> tasks = new ArrayList<>();
+    private final AtomicLong counter = new AtomicLong();
 
-            // Tabelle erstellen, falls sie noch nicht existiert
-            String createTableSQL = "CREATE TABLE IF NOT EXISTS todos ("
-                    + "id INT PRIMARY KEY AUTO_INCREMENT, "
-                    + "task VARCHAR(255), "
-                    + "completed BOOLEAN DEFAULT FALSE)";
+    @GetMapping
+    public List<Task> getAllTasks() {
+        return tasks;
+    }
 
-            try (Statement statement = connection.createStatement()) {
-                statement.execute(createTableSQL);
-                System.out.println("Tabelle 'todos' erfolgreich erstellt oder bereits vorhanden!");
-            } catch (SQLException e) {
-                System.out.println("Fehler beim Erstellen der Tabelle!");
-                e.printStackTrace();
+    @PostMapping
+    public Task addTask(@RequestBody Task newTask) {
+        newTask.setId(counter.incrementAndGet());
+        tasks.add(newTask);
+        return newTask;
+    }
+
+    @DeleteMapping("/{id}")
+    public void deleteTask(@PathVariable Long id) {
+        tasks.removeIf(task -> task.getId().equals(id));
+    }
+
+    @PutMapping("/{id}")
+    public Task updateTask(@PathVariable Long id, @RequestBody Task updatedTask) {
+        for (Task task : tasks) {
+            if (task.getId().equals(id)) {
+                task.setCompleted(updatedTask.isCompleted());
+                return task;
             }
-        } catch (SQLException e) {
-            System.out.println("Verbindung fehlgeschlagen!");
-            e.printStackTrace();
         }
+        return null;
+    }
+}
+
+@Controller
+@RequestMapping("/tasks")
+class TodoViewController {
+    private final List<Task> tasks = new ArrayList<>();
+    private final AtomicLong counter = new AtomicLong();
+
+    @GetMapping
+    public String getAllTasks(Model model) {
+        model.addAttribute("tasks", tasks);
+        return "todo";  // Thymeleaf sucht nach einer Datei mit dem Namen "todo.html" in /resources/templates
+    }
+
+    @PostMapping("/addTask")
+    public String addTask(String description) {
+        Task newTask = new Task();
+        newTask.setId(counter.incrementAndGet());
+        newTask.setDescription(description);
+        newTask.setCompleted(false);
+        tasks.add(newTask);
+        return "redirect:/tasks";  // Nach dem Hinzufügen einer Aufgabe wird die Liste neu geladen
+    }
+}
+
+@RestController
+@RequestMapping("/")
+ class HomeController {
+    @GetMapping
+    public String home() {
+        return "Hello, world!";
+    }
+}
+
+@Setter
+@Getter
+class Task {
+    private Long id;
+    private String description;
+    private boolean completed;
+
+    public ResponseEntity<Task> addTask(@Valid @RequestBody Task newTask) {
+        return null;
     }
 }
