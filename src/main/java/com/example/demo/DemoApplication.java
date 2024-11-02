@@ -1,9 +1,11 @@
 package com.example.demo;
 
+import jakarta.validation.Valid;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -60,6 +62,9 @@ class Task {
 	private String description;
 	private boolean completed;
 
+    public ResponseEntity<Task> addTask(@Valid @RequestBody Task newTask) {
+        return null;
+    }
 
 }
 
