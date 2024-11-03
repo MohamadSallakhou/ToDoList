@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="style.css" />
+    <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+            integrity="sha512-1ycn6IcaQQ40/MKBW2W4Rhis/DbILU74C1vSrLJxCq57o941Ym01SwNsOMqvEBFlcgUa6xLiPY/NS5R+E6ztJQ=="
+            crossorigin="anonymous"
+            referrerpolicy="no-referrer"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+            href="https://fonts.googleapis.com/css2?family=Poppins&display=swap"
+            rel="stylesheet"
+    />
+    <title>Todo</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Vue.Draggable/2.24.3/vuedraggable.umd.min.js"></script>
+</head>
+<body>
+<div id="app">
+    <header>ToDoList</header>
+
+    <!-- NavBar Komponente -->
+    <nav class="nav-bar">
+        <ul>
+            <li><a href="#" @click.prevent="currentView = 'home'"><i class="fas fa-home"></i> Home</a></li>
+            <li><a href="#" @click.prevent="currentView = 'tasks'"><i class="fas fa-tasks"></i> Tasks</a></li>
+            <li><a href="#" @click.prevent="currentView = 'about'"><i class="fas fa-info-circle"></i> About</a></li>
+        </ul>
+    </nav>
+
+    <!-- InfoBox Komponente -->
+    <div class="info-box" v-if="currentView === 'home'">
+        <h2>Willkommen zur ToDo App!</h2>
+        <p>Dies ist die Startseite Ihrer Anwendung.</p>
+    </div>
+
+    <!-- About Section -->
+    <div class="info-box" v-if="currentView === 'about'">
+        <h2>Über diese App</h2>
+        <p>Diese App hilft Ihnen dabei, Ihre Aufgaben effizient zu verwalten. Entwickelt mit Liebe und JavaScript.</p>
+    </div>
+
+    <!-- Todo Form und Liste -->
+    <form v-if="currentView === 'tasks'" action="#" th:action="@{/addTask}" method="post" @submit.prevent="addTodo">
+        <input type="text" name="description" class="todo-input" v-model="newTodo" placeholder="Neue Aufgabe" />
+        <button type="submit" class="todo-button" :disabled="newTodo.trim() === ''">
+            <i class="fas fa-plus-square"></i>
+        </button>
+    </form>
+    <div class="todo-container" v-if="currentView === 'tasks'">
+        <draggable v-model="todos" class="todo-list">
+            <li v-for="(todo, index) in filteredTodos" :key="index" :class="{ completed: todo.completed }" class="todo">
+                <div class="todo-item" th:text="${todo.description}">{{ todo.text }}</div>
+                <span th:text="${todo.completed ? 'Erledigt' : 'Offen'}"></span>
+                <button @click="toggleComplete(index)" class="complete-btn">
+                    <i class="fas fa-check"></i>
+                </button>
+                <button @click="deleteTodo(index)" class="trash-btn">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </li>
+        </draggable>
+    </div>
+    <div v-if="currentView === 'tasks'">
+        <button @click="filter = 'all'">Alle</button>
+        <button @click="filter = 'completed'">Erledigt</button>
+        <button @click="filter = 'active'">Nicht erledigt</button>
+    </div>
+</div>
+
+<script>
+    new Vue({
+        el: '#app',
+        data: {
+            currentView: 'home',
+            newTodo: '',
+            todos: JSON.parse(localStorage.getItem('todos')) || [],
+            filter: 'all'
+        },
+        computed: {
+            filteredTodos() {
+                if (this.filter === 'completed') {
+                    return this.todos.filter(todo => todo.completed);
+                } else if (this.filter === 'active') {
+                    return this.todos.filter(todo => !todo.completed);
+                } else {
+                    return this.todos;
+                }
+            }
+        },
+        methods: {
+            addTodo() {
+                if (this.newTodo.trim() === '') {
+                    alert('Bitte geben Sie eine Aufgabe ein.');
+                    return;
+                }
+                this.todos.push({ text: this.newTodo, completed: false });
+                this.newTodo = '';
+                this.saveTodos();
+            },
+            deleteTodo(index) {
+                if (confirm('Sind Sie sicher, dass Sie diese Aufgabe löschen möchten?')) {
+                    this.todos.splice(index, 1);
+                    this.saveTodos();
+                }
+            },
+            toggleComplete(index) {
+                this.todos[index].completed = !this.todos[index].completed;
+                this.saveTodos();
+            },
+            saveTodos() {
+                localStorage.setItem('todos', JSON.stringify(this.todos));
+            }
+        }
+    });
+</script>
+</body>
+</html>

@@ -1,11 +1,9 @@
 package com.example.demo;
 
-import jakarta.validation.Valid;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -79,14 +77,8 @@ class TodoViewController {
 	}
 }
 
-@RestController
-@RequestMapping("/")
-class HomeController {
-	@GetMapping
-	public String home() {
-		return "Willkommen zur ToDo-Liste Anwendung! Verwende /tasks, um die Aufgabenliste zu sehen.";
-	}
-}
+
+
 
 @Setter
 @Getter
