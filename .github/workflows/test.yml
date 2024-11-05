@@ -10,13 +10,13 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Set permissions for Gradlew
-        run: chmod +x gradlew  # Füge diesen Schritt hinzu
+        run: chmod +x gradlew
 
-      - name: Set up JDK 16
+      - name: Set up JDK 17  # Verwende Java 17 anstelle von Java 16
         uses: actions/setup-java@v2
         with:
           distribution: "adopt"
-          java-version: 16
+          java-version: 17
 
       - name: Clean and build
         run: ./gradlew clean test --info --stacktrace
