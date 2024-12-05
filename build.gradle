@@ -1,6 +1,6 @@
 plugins {
 	id 'java'
-	id 'org.springframework.boot' version '3.1.4' // Version angepasst
+	id 'org.springframework.boot' version '3.3.4'
 	id 'io.spring.dependency-management' version '1.1.6'
 }
 
@@ -9,7 +9,7 @@ version = '0.0.1-SNAPSHOT'
 
 java {
 	toolchain {
-		languageVersion = JavaLanguageVersion.of(17) // Anpassung auf Java 17
+		languageVersion = JavaLanguageVersion.of(21)
 	}
 }
 
@@ -26,8 +26,7 @@ repositories {
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
-	implementation 'org.springframework.boot:spring-boot-starter-web-services'
-	implementation 'com.h2database:h2' // H2-Datenbank hinzugefügt
+	implementation 'org.springframework.boot:spring-boot-starter-web'
 	compileOnly 'org.projectlombok:lombok'
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 	annotationProcessor 'org.projectlombok:lombok'
@@ -37,16 +36,4 @@ dependencies {
 
 tasks.named('test') {
 	useJUnitPlatform()
-	bootRun {
-		mainClass = 'com.example.demo.TodoApplication' // Stelle sicher, dass die Klasse existiert
-	}
-
-	jar {
-		manifest {
-			attributes(
-					'Main-Class': 'com.example.demo.TodoApplication' // Die Klasse, die im JAR ausgeführt werden soll
-			)
-		}
-	}
-
 }
