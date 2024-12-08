@@ -1,11 +1,9 @@
-package com.example.demo;
+package demo;
 
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -13,9 +11,9 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
 @SpringBootApplication
-class TodoApplication {
+public class DemoApplication {
 	public static void main(String[] args) {
-		SpringApplication.run(TodoApplication.class, args);
+		SpringApplication.run(DemoApplication.class, args);
 	}
 }
 
@@ -25,11 +23,13 @@ class TodoController {
 	private final List<Task> tasks = new ArrayList<>();
 	private final AtomicLong counter = new AtomicLong();
 
+	// Alle Aufgaben abrufen
 	@GetMapping
 	public List<Task> getAllTasks() {
 		return tasks;
 	}
 
+	// Neue Aufgabe hinzufügen
 	@PostMapping
 	public Task addTask(@RequestBody Task newTask) {
 		newTask.setId(counter.incrementAndGet());
@@ -37,48 +37,25 @@ class TodoController {
 		return newTask;
 	}
 
+	// Aufgabe löschen
 	@DeleteMapping("/{id}")
 	public void deleteTask(@PathVariable Long id) {
 		tasks.removeIf(task -> task.getId().equals(id));
 	}
 
+	// Aufgabe aktualisieren
 	@PutMapping("/{id}")
 	public Task updateTask(@PathVariable Long id, @RequestBody Task updatedTask) {
 		for (Task task : tasks) {
 			if (task.getId().equals(id)) {
+				task.setDescription(updatedTask.getDescription());
 				task.setCompleted(updatedTask.isCompleted());
 				return task;
 			}
 		}
-		return null;
+		return null; // Falls die ID nicht existiert
 	}
 }
-
-@Controller
-@RequestMapping("/tasks")
-class TodoViewController {
-	private final List<Task> tasks = new ArrayList<>();
-	private final AtomicLong counter = new AtomicLong();
-
-	@GetMapping
-	public String getAllTasks(Model model) {
-		model.addAttribute("tasks", tasks);
-		return "todo";  // Thymeleaf sucht nach einer Datei mit dem Namen "todo.html" in /resources/templates
-	}
-
-	@PostMapping("/addTask")
-	public String addTask(String description) {
-		Task newTask = new Task();
-		newTask.setId(counter.incrementAndGet());
-		newTask.setDescription(description);
-		newTask.setCompleted(false);
-		tasks.add(newTask);
-		return "redirect:/tasks";  // Nach dem Hinzufügen einer Aufgabe wird die Liste neu geladen
-	}
-}
-
-
-
 
 @Setter
 @Getter
