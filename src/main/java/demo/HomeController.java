@@ -10,3 +10,4 @@ public class HomeController {
         return "index"; // Name der View-Datei (ohne .html)
     }
 }
+
