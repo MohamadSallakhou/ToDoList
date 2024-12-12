@@ -1,4 +1,5 @@
-package demo;
+package com.example.demo;
+
 
 
 import lombok.Getter;
