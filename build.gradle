@@ -36,13 +36,12 @@ dependencies {
 }
 
 application {
-	mainClass = 'demo.DemoApplication'
+	mainClass = 'com.example.demo.TodoApplication'
 }
 
 bootJar {
-	mainClassName = 'demo.DemoApplication'
+	mainClassName = 'com.example.demo.TodoApplication'
 }
-
 
 tasks.named('test') {
 	useJUnitPlatform()
