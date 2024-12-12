@@ -36,11 +36,13 @@ dependencies {
 }
 
 application {
-	mainClass = 'com.example.demo.TodoApplication'
+	// Hauptklasse des Programms, angepasst an den aktuellen Pfad
+	mainClass = 'demo.DemoApplication'
 }
 
 bootJar {
-	mainClassName = 'com.example.demo.TodoApplication'
+	// Hauptklasse für das Spring Boot Jar
+	mainClassName = 'demo.DemoApplication'
 }
 
 tasks.named('test') {
