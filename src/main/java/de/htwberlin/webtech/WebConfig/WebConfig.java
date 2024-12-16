@@ -14,8 +14,7 @@ public class WebConfig implements WebMvcConfigurer {
                 .addMapping("/**")
                 .allowedMethods("*")
                 .allowedOrigins(
-                        "http://localhost:5173", // da soll was änderen
-                        "https://todolist-zdkp.onrender.com" // da auch
-                );
+                        "http://localhost:4173",
+                        "https://todolist-zdkp.onrender.com"                 );
     }
 }
