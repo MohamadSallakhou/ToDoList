@@ -1,5 +1,6 @@
 package de.htwberlin.webtech.service;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
@@ -8,8 +9,10 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 import de.htwberlin.webtech.model.Task;
 
+
 @Service
 public class TaskService {
+    @Autowired
     private final List<Task> tasks = new ArrayList<>();
     private final AtomicLong counter = new AtomicLong();
 

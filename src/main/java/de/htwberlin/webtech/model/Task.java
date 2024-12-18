@@ -1,11 +1,15 @@
 package de.htwberlin.webtech.model;
 
-import lombok.Getter;
-import lombok.Setter;
+import jakarta.persistence.Entity;
+import lombok.*;
 
 // Task-Klasse
-@Setter
+@Entity
 @Getter
+@Setter
+@ToString
+@NoArgsConstructor
+@AllArgsConstructor
 public class Task {
     private Long id;
     private String description;
