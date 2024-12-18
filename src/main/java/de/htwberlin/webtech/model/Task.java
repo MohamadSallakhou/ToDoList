@@ -1,10 +1,10 @@
 package de.htwberlin.webtech.model;
 
-import jakarta.persistence.Entity;
+
 import lombok.*;
 
 // Task-Klasse
-@Entity
+
 @Getter
 @Setter
 @ToString

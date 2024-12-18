@@ -12,7 +12,7 @@ import de.htwberlin.webtech.model.Task;
 
 @Service
 public class TaskService {
-    @Autowired
+
     private final List<Task> tasks = new ArrayList<>();
     private final AtomicLong counter = new AtomicLong();
 
