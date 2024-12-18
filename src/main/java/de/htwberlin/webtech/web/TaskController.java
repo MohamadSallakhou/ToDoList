@@ -31,9 +31,12 @@ public class TaskController {
 
     @GetMapping("/{id}")
     public ResponseEntity<Task> getTask(@PathVariable("id") final Long id) {
-        return taskService.getTaskById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+        final Optional<Task> task = Optional.ofNullable(taskService.getTaskById(id));
+        if (!task.isPresent()) {
+            return ResponseEntity.notFound().build();
+        } else {
+            return ResponseEntity.ok(task.get());
+        }
     }
 
 
