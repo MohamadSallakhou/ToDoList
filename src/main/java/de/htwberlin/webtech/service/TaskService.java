@@ -1,100 +1,55 @@
 package de.htwberlin.webtech.service;
 
-import de.htwberlin.webtech.repository.TaskRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.concurrent.atomic.AtomicLong;
-import java.util.stream.Collectors;
 import de.htwberlin.webtech.model.Task;
+import org.springframework.stereotype.Service;
 
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class TaskService {
 
-    @Autowired
-    private TaskRepository taskRepository;
+    private final Map<Long, Task> tasks = new HashMap<>(Map.of(
+            1L, new Task(1L, "Einkaufen gehen", false),
+            2L, new Task(2L, "Hausaufgaben erledigen", true),
+            3L, new Task(3L, "Mit Freunden treffen", false)
+    ));
+    private long nextId = 4;
 
-    //private final List<Task> tasks = new ArrayList<>();
-    private final AtomicLong counter = new AtomicLong();
-
-    // public List<Task> getAllTasks() {
-    //    return new ArrayList<>(tasks);
-    //}
-
-    //public Task addTask(String description) {
-    //    Task newTask = new Task();
-    //    newTask.setId(counter.incrementAndGet());
-    //    newTask.setDescription(description);
-    //    newTask.setCompleted(false);
-    //    tasks.add(newTask);
-    //    return newTask;
-    //}
-
-   // public Task updateTask(Long id, Task updatedTask) {
-   //     for (Task task : tasks) {
-   //         if (task.getId().equals(id)) {
-   //             task.setDescription(updatedTask.getDescription());
-   //             task.setCompleted(updatedTask.isCompleted());
-   //             return task;
-   //         }
-   //     }
-   //     return null; // Task mit der ID existiert nicht
-   // }
-
-    //public boolean deleteTask(Long id) {
-    //    return tasks.removeIf(task -> task.getId().equals(id));
-    //}
-
-    //public Optional<Task> getTaskById(Long id) { // Geändert von Boolean zu Long
-    //    return tasks.stream()
-    //            .filter(task -> task.getId().equals(id))
-    //            .findFirst();
-    //}
-
-    //public List<Task> getTasksByCompletion(boolean completed) {
-    //    return tasks.stream()
-    //            .filter(task -> task.isCompleted() == completed)
-    //            .collect(Collectors.toList());
-    //}
-
-    public Task addTask(String description) {
-        Task newTask = new Task();
-        newTask.setId(counter.incrementAndGet());
-        newTask.setDescription(description);
-        newTask.setCompleted(false);
-        return createTask(newTask);
-    }
-
+    // Abrufen aller Aufgaben
     public List<Task> getAllTasks() {
-        return taskRepository.findAll();
+        return new ArrayList<>(tasks.values());
     }
 
-    public Task getTaskById(Long id) {
-        Optional<Task> task = taskRepository.findById(id);
-        return task.orElse(null);
+    // Abrufen einer Aufgabe anhand der ID
+    public Optional<Task> getTaskById(Long id) {
+        return Optional.ofNullable(tasks.get(id));
     }
 
-    public List<Task> getTasksByCompletion(boolean completed) {
-        return taskRepository.findByCompleted(completed);
+    // Hinzufügen einer neuen Aufgabe
+    public Task addTask(String description) {
+        Task newTask = new Task(nextId++, description, false);
+        tasks.put(newTask.getId(), newTask);
+        return newTask;
     }
 
-    public Task createTask(Task task) {
-        return taskRepository.save(task);
+    // Aktualisieren einer bestehenden Aufgabe
+    public Task updateTask(Long id, Task updatedTask) {
+        if (!tasks.containsKey(id)) return null;
+        updatedTask.setId(id);
+        tasks.put(id, updatedTask);
+        return updatedTask;
     }
 
-    public Task updateTask(Long id, Task task) {
-        if (taskRepository.existsById(id)) {
-            task.setId(id); return taskRepository.save(task);
-        }
-        return null;
-    }
-
+    // Löschen einer Aufgabe
     public boolean deleteTask(Long id) {
-        taskRepository.deleteById(id);
-        return getTaskById(id) == null;
+        return tasks.remove(id) != null;
     }
 
+    // Abrufen von Aufgaben nach Status
+    public List<Task> getTasksByCompletion(boolean completed) {
+        return tasks.values().stream()
+                .filter(task -> task.isCompleted() == completed)
+                .collect(Collectors.toList());
+    }
 }
