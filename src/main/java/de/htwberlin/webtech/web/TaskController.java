@@ -1,62 +1,67 @@
 package de.htwberlin.webtech.web;
-import org.springframework.http.ResponseEntity;
-
 
 import de.htwberlin.webtech.model.Task;
 import de.htwberlin.webtech.service.TaskService;
-import jakarta.validation.Valid;
-import lombok.AllArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Optional;
+import java.util.List;
 
-@Controller
-@AllArgsConstructor
+@RestController
+@CrossOrigin(origins = "http://localhost:5173")
 @RequestMapping("/api/tasks")
 public class TaskController {
 
-    private final TaskService taskService;
+    @Autowired
+    private TaskService taskService;
 
-    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Iterable<Task>> getTasks(@RequestParam final Optional<Boolean> completed) {
-        final Iterable<Task> result = completed.isEmpty()
-                ? taskService.getAllTasks()
-                : taskService.getTasksByCompletion(completed.get());
-        return ResponseEntity.ok(result);
-    }
-
-    @GetMapping("/{id}")
-    public ResponseEntity<Task> getTask(@PathVariable("id") final Long id) {
-        final Optional<Task> task = Optional.ofNullable(taskService.getTaskById(id));
-        if (!task.isPresent()) {
-            return ResponseEntity.notFound().build();
-        } else {
-            return ResponseEntity.ok(task.get());
-        }
-    }
-
-
+    // Create a new task
     @PostMapping
-    public ResponseEntity<Task> addTask(@Valid @RequestBody final Task task) {
-        final Task created = taskService.addTask(task.getDescription());
-        return new ResponseEntity<>(created, HttpStatus.CREATED);
+    public ResponseEntity<Task> createTask(@RequestBody Task task) {
+        Task createdTask = taskService.createTask(task);
+        return ResponseEntity.ok(createdTask);
     }
 
-    @PutMapping(path = "/{id}")
-    public ResponseEntity<Task> updateTask(@PathVariable("id") final Long id, @RequestBody Task body) {
-        body.setId(id);
-        final Task updatedTask = taskService.updateTask(id, body);
-        return updatedTask == null ? ResponseEntity.notFound().build() : ResponseEntity.ok(updatedTask);
+    // Get all tasks
+    @GetMapping
+    public ResponseEntity<List<Task>> getAllTasks() {
+        return ResponseEntity.ok(taskService.getAllTasks());
     }
 
-    @DeleteMapping(path = "/{id}")
-    public ResponseEntity<Void> deleteTask(@PathVariable("id") final Long id) {
-        return taskService.deleteTask(id)
-                ? ResponseEntity.noContent().build()
-                : ResponseEntity.notFound().build();
+    // Get a task by ID
+    @GetMapping("/{id}")
+    public ResponseEntity<Task> getTaskById(@PathVariable Long id) {
+        Task task = taskService.getTaskById(id);
+        if (task == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(task);
+    }
+
+    // Get tasks by completion status
+    @GetMapping("/completed/{status}")
+    public ResponseEntity<List<Task>> getTasksByCompletion(@PathVariable boolean status) {
+        return ResponseEntity.ok(taskService.getTasksByCompletion(status));
+    }
+
+    // Update a task
+    @PutMapping("/{id}")
+    public ResponseEntity<Task> updateTask(@PathVariable Long id, @RequestBody Task task) {
+        Task updatedTask = taskService.updateTask(id, task);
+        if (updatedTask == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(updatedTask);
+    }
+
+    // Delete a task
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteTask(@PathVariable Long id) {
+        boolean deleted = taskService.deleteTask(id);
+        if (!deleted) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.noContent().build();
     }
 }
